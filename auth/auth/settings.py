@@ -25,8 +25,8 @@ SECRET_KEY = 'kq9e*a#e_lu51k80tadoy1!wmrxt2ce-)tc^=(^tc_o5zjzjg*'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['127.0.0.1']
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
 
@@ -42,9 +42,11 @@ INSTALLED_APPS = [
     'django_filters',
     'graphql_jwt.refresh_token.apps.RefreshTokenConfig',
     "graphql_auth",
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

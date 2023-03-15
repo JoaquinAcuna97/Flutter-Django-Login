@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
+import "package:graphql_flutter/graphql_flutter.dart";
+import 'graphQLConf.dart';
+import 'queryMutation.dart';
 
-void main() => runApp(new MyApp());
+GraphQLConfiguration graphQLConfiguration = GraphQLConfiguration();
+void main() {
+    WidgetsFlutterBinding.ensureInitialized();
+      runApp(      GraphQLProvider(
+        client: graphQLConfiguration.client,
+        child: CacheProvider(child: MyApp()),
+      ),);
+      }
 
 class MyApp extends StatelessWidget {
+  
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -18,6 +29,7 @@ class MyApp extends StatelessWidget {
 class LoginPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => new _LoginPageState();
+
 }
 
 // Used for controlling whether the user is loggin or creating an account
@@ -27,7 +39,8 @@ enum FormType {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
+  GraphQLConfiguration graphQLConfiguration = GraphQLConfiguration();
+  QueryMutation addMutation = QueryMutation();
   final TextEditingController _emailFilter = new TextEditingController();
   final TextEditingController _passwordFilter = new TextEditingController();
   String _email = "";
@@ -155,13 +168,24 @@ class _LoginPageState extends State<LoginPage> {
 
   // These functions can self contain any user auth logic required, they all have access to _email and _password
 
-  void _loginPressed () {
+  void _loginPressed  () async{
     print('The user wants to login with $_email and $_password');
   }
 
-  void _createAccountPressed () {
+  void _createAccountPressed () async {
     print('The user wants to create an accoutn with $_email and $_password');
-
+    GraphQLClient _client = graphQLConfiguration.clientToQuery();
+    QueryResult result = await _client.mutate(
+      MutationOptions(
+        document: addMutation.register('$_email','','$_password'),
+      ),
+    );
+    if (result.data["success"]!=null){
+      print('The user was created succesfully!');
+    }else{
+      print('There was an error!');
+      print(result.data["register"]["errors"]["email"][0]["message"]);
+    }
   }
 
   void _passwordReset () {
